@@ -138,7 +138,7 @@ export default function Header() {
             href="/explore"
             className="text-sm font-medium hover:underline"
           >
-            Explore events
+            Explore Events
           </Link>
         </div>
 
@@ -149,7 +149,7 @@ export default function Header() {
               href="/organizer/dashboard"
               className="text-sm font-medium hover:underline"
             >
-              Organizer dashboard
+              Organizer Dashboard
             </Link>
           )}
 

@@ -42,6 +42,7 @@ model SavedEvent {
 
 model Booking {
   id        String   @id @default(uuid())
+  ticketId  String  @unique
   userId    String
   eventId   String
   quantity  Int
@@ -53,3 +54,5 @@ model Booking {
 
   @@index([userId])
 }
+
+

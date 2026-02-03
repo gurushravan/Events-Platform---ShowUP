@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
+import { randomUUID } from 'crypto'
 
 export async function POST(req: Request) {
   const { eventId, userId, quantity } = await req.json()
@@ -51,18 +52,25 @@ export async function POST(req: Request) {
 
   const total = event.price * quantity
 
+  // ✅ Generate unique ticket ID (QR payload)
+  const ticketId = `TICKET-${randomUUID()}`
+
   try {
     const booking = await prisma.booking.create({
       data: {
         userId,
         eventId,
         quantity,
-        total
+        total,
+        ticketId
       }
     })
 
     return NextResponse.json(
-      { bookingId: booking.id },
+      {
+        bookingId: booking.id,
+        ticketId
+      },
       { status: 201 }
     )
   } catch (err) {

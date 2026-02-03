@@ -37,7 +37,7 @@ export default function Footer() {
                   href="/organizer-guide"
                   className="hover:text-white hover:underline"
                 >
-                  Organizer guide
+                  Organizer Guide
                 </Link>
               </li>
             </ul>
@@ -54,7 +54,7 @@ export default function Footer() {
                   href="/terms"
                   className="hover:text-white hover:underline"
                 >
-                  Terms of service
+                  Terms of Service
                 </Link>
               </li>
               <li>
@@ -62,7 +62,7 @@ export default function Footer() {
                   href="/privacy"
                   className="hover:text-white hover:underline"
                 >
-                  Privacy policy
+                  Privacy Policy
                 </Link>
               </li>
             </ul>

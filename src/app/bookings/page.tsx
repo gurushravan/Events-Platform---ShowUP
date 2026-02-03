@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
-
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,83 +67,97 @@ export default function MyBookingsPage() {
   }
 
   return (
-    <>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <h1 className="mb-4 text-xl font-semibold">
+        My bookings
+      </h1>
 
+      {loading ? (
+        <p className="text-sm text-gray-600">
+          Loading bookings...
+        </p>
+      ) : bookings.length === 0 ? (
+        <p className="text-sm text-gray-600">
+          You have not booked any events yet.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {bookings.map(booking => (
+            <div
+              key={booking.id}
+              className="rounded border p-4"
+            >
+              <h2 className="text-sm font-semibold">
+                {booking.event.title}
+              </h2>
 
-      <main className="mx-auto max-w-3xl px-4 py-6">
-        <h1 className="mb-4 text-xl font-semibold">
-          My bookings
-        </h1>
+              <p className="text-xs text-gray-600">
+                {new Date(
+                  booking.event.date
+                ).toDateString()}
+              </p>
 
-        {loading ? (
-          <p className="text-sm text-gray-600">
-            Loading bookings...
-          </p>
-        ) : bookings.length === 0 ? (
-          <p className="text-sm text-gray-600">
-            You have not booked any events yet.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {bookings.map(booking => (
-              <div
-                key={booking.id}
-                className="rounded border p-4"
-              >
-                <h2 className="text-sm font-semibold">
-                  {booking.event.title}
-                </h2>
+              <div className="mt-2 flex justify-between text-sm">
+                <span>
+                  Tickets: {booking.quantity}
+                </span>
 
-                <p className="text-xs text-gray-600">
-                  {new Date(
-                    booking.event.date
-                  ).toDateString()}
-                </p>
+                <span className="font-medium">
+                  ₹{booking.total}
+                </span>
+              </div>
 
-                <div className="mt-2 flex justify-between text-sm">
-                  <span>
-                    Tickets: {booking.quantity}
-                  </span>
+              <p className="mt-1 text-xs text-gray-500">
+                Booked on{' '}
+                {new Date(
+                  booking.createdAt
+                ).toLocaleDateString()}
+              </p>
 
-                  <span className="font-medium">
-                    ₹{booking.total}
-                  </span>
-                </div>
-
+              {/* Ticket info */}
+              {booking.ticketId && (
                 <p className="mt-1 text-xs text-gray-500">
-                  Booked on{' '}
-                  {new Date(
-                    booking.createdAt
-                  ).toLocaleDateString()}
+                  Ticket ID: {booking.ticketId}
                 </p>
+              )}
 
+              <div className="mt-3 flex items-center gap-3">
                 {booking.status === 'CONFIRMED' ? (
-                  <button
-                    onClick={() =>
-                      cancelBooking(
-                        booking.id,
-                        booking.userId
-                      )
-                    }
-                    disabled={cancellingId === booking.id}
-                    className="mt-3 rounded border px-3 py-1 text-xs hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {cancellingId === booking.id
-                      ? 'Cancelling...'
-                      : 'Cancel booking'}
-                  </button>
+                  <>
+                    <Link
+                      href={`/bookings/success?bookingId=${booking.id}`}
+                      className="rounded bg-black px-3 py-1 text-xs text-white hover:bg-gray-800"
+                    >
+                      View ticket
+                    </Link>
+
+                    <button
+                      onClick={() =>
+                        cancelBooking(
+                          booking.id,
+                          booking.userId
+                        )
+                      }
+                      disabled={
+                        cancellingId === booking.id
+                      }
+                      className="rounded border px-3 py-1 text-xs hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {cancellingId === booking.id
+                        ? 'Cancelling...'
+                        : 'Cancel booking'}
+                    </button>
+                  </>
                 ) : (
-                  <span className="mt-3 inline-block text-xs font-medium text-red-600">
+                  <span className="text-xs font-medium text-red-600">
                     Cancelled
                   </span>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-
-    </>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   )
 }
