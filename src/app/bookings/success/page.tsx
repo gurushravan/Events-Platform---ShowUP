@@ -5,14 +5,25 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
+
+type EventData = {
+  title: string
+  date: string
+  venue: string
+}
+
 type BookingData = {
   id: string
   ticketId: string
-  event: {
-    title: string
-    date: string
-    venue: string
-  }
+  event: EventData | null
 }
 
 export default function BookingSuccessPage() {
@@ -21,23 +32,43 @@ export default function BookingSuccessPage() {
 
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!bookingId) return
+    if (!bookingId) {
+      setError('Missing booking ID')
+      setLoading(false)
+      return
+    }
 
     async function fetchBooking() {
-      const res = await fetch(`/api/bookings/check`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId })
-      })
+      try {
+        const res = await fetch('/api/bookings/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        })
 
-      if (res.ok) {
+        if (!res.ok) {
+          throw new Error('Failed to fetch booking')
+        }
+
         const data = await res.json()
-        setBooking(data)
-      }
 
-      setLoading(false)
+        if (!data || !data.ticketId) {
+          throw new Error('Invalid booking data')
+        }
+
+        setBooking({
+          id: data.id,
+          ticketId: data.ticketId,
+          event: data.event ?? null
+        })
+      } catch (err) {
+        setError('Unable to load booking details')
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchBooking()
@@ -59,7 +90,13 @@ export default function BookingSuccessPage() {
         </p>
       )}
 
-      {!loading && booking && (
+      {!loading && error && (
+        <p className="text-sm text-red-600">
+          {error}
+        </p>
+      )}
+
+      {!loading && booking && booking.event && (
         <div className="mb-6 rounded-lg border p-4">
           <div className="mb-4 flex justify-center">
             <QRCodeCanvas
@@ -74,17 +111,23 @@ export default function BookingSuccessPage() {
               {booking.event.title}
             </p>
             <p className="text-gray-600">
-              {booking.event.date}
+              {formatDate(booking.event.date)}
             </p>
             <p className="text-gray-600">
               {booking.event.venue}
             </p>
           </div>
 
-          <div className="mt-3 rounded bg-gray-100 px-2 py-1 text-xs">
+          <div className="mt-3 rounded bg-black-100 px-2 py-1 text-xs">
             Ticket ID: {booking.ticketId}
           </div>
         </div>
+      )}
+
+      {!loading && booking && !booking.event && (
+        <p className="text-sm text-gray-600">
+          Booking found, but event details are unavailable.
+        </p>
       )}
 
       <div className="flex justify-center gap-4">

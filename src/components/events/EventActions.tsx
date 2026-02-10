@@ -16,7 +16,6 @@ export default function EventActions({
       ? new Date(eventDate)
       : eventDate
 
-  // Normalize to start of today to avoid time issues
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 

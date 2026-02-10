@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -16,9 +15,9 @@ type OrganizerEvent = {
   date: string
   capacity: number
   booked: number
+  checkedIn: number
   remaining: number
   isDeleted: boolean
-  checkedIn: number
 }
 
 export default function OrganizerDashboardPage() {
@@ -76,113 +75,120 @@ export default function OrganizerDashboardPage() {
   }
 
   return (
-    <>
+    <main className="mx-auto max-w-4xl px-4 py-6">
+      <h1 className="mb-6 text-xl font-semibold">
+        Organizer dashboard
+      </h1>
 
-      <main className="mx-auto max-w-4xl px-4 py-6">
-        <h1 className="mb-6 text-xl font-semibold">
-          Organizer dashboard
-        </h1>
+      {loading ? (
+        <p className="text-sm text-gray-600">
+          Loading events...
+        </p>
+      ) : events.length === 0 ? (
+        <p className="text-sm text-gray-600">
+          You have not created any events yet.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {events.map(event => {
+            const used = event.booked + event.checkedIn
+            const percent = Math.round(
+              (used / event.capacity) * 100
+            )
 
-        {loading ? (
-          <p className="text-sm text-gray-600">
-            Loading events...
-          </p>
-        ) : events.length === 0 ? (
-          <p className="text-sm text-gray-600">
-            You have not created any events yet.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {events.map(event => {
-              const percent = Math.round(
-                (event.booked / event.capacity) * 100
-              )
+            return (
+              <div
+                key={event.id}
+                className={`rounded border p-4 ${
+                  event.isDeleted
+                    ? 'bg-gray-50 opacity-70'
+                    : ''
+                }`}
+              >
+                <div className="mb-1 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">
+                    {event.title}
+                  </h2>
 
-              return (
-                <div
-                  key={event.id}
-                  className={`rounded border p-4 ${
-                    event.isDeleted
-                      ? 'bg-gray-50 opacity-70'
-                      : ''
-                  }`}
-                >
-                  <div className="mb-1 flex items-center justify-between">
-                    <h2 className="text-sm font-semibold">
-                      {event.title}
-                    </h2>
-
-                    <span className="text-xs text-gray-600">
-                      {new Date(event.date).toDateString()}
-                    </span>
-                  </div>
-
-                  <p className="mb-1 text-xs text-gray-600">
-                    {event.booked + event.checkedIn} / {event.capacity} tickets used
-                  </p>
-
-                  <p className="text-xs text-gray-500">
-                    {event.checkedIn} checked in
-                  </p>
-
-
-                  <div className="h-2 w-full overflow-hidden rounded bg-gray-200">
-                    <div
-                      className={`h-full ${
-                        percent >= 90
-                          ? 'bg-red-500'
-                          : percent >= 70
-                          ? 'bg-yellow-500'
-                          : 'bg-green-500'
-                      }`}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-
-                  <p className="mt-2 text-xs text-gray-500">
-                    {event.remaining > 0
-                      ? `${event.remaining} tickets remaining`
-                      : 'Sold out'}
-                  </p>
-
-                  {/* Actions */}
-                  <div className="mt-3 flex items-center gap-3">
-                    {event.isDeleted ? (
-                      <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">
-                        Deleted
-                      </span>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() =>
-                            router.push(
-                              `/organizer/events/${event.id}/edit`
-                            )
-                          }
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            handleDelete(event.id)
-                          }
-                          className="text-sm text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  <span className="text-xs text-gray-600">
+                    {new Date(event.date).toDateString()}
+                  </span>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </main>
 
+                <p className="mb-1 text-xs text-gray-600">
+                  {used} / {event.capacity} tickets used
+                </p>
 
-    </>
+                <p className="text-xs text-gray-500">
+                  {event.checkedIn} checked in
+                </p>
+
+                <div className="mt-2 h-2 w-full overflow-hidden rounded bg-gray-200">
+                  <div
+                    className={`h-full ${
+                      percent >= 90
+                        ? 'bg-red-500'
+                        : percent >= 70
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                    }`}
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+
+                <p className="mt-2 text-xs text-gray-500">
+                  {event.remaining > 0
+                    ? `${event.remaining} tickets remaining`
+                    : 'Sold out'}
+                </p>
+
+                {/* Actions */}
+                <div className="mt-3 flex items-center gap-4">
+                  {event.isDeleted ? (
+                    <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">
+                      Deleted
+                    </span>
+                  ) : (
+                    <>
+                      {/* NEW: Scan button */}
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/organizer/events/${event.id}/scan`
+                          )
+                        }
+                        className="text-sm font-medium text-green-700 hover:underline"
+                      >
+                        Scan / Check-in
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/organizer/events/${event.id}/edit`
+                          )
+                        }
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleDelete(event.id)
+                        }
+                        className="text-sm text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </main>
   )
 }

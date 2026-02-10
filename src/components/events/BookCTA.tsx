@@ -22,7 +22,6 @@ export default function BookCTA({ eventId }: { eventId: string }) {
         data: { user }
       } = await supabase.auth.getUser()
 
-      // fetch event for capacity
       const eventRes = await fetch(`/api/events/${eventId}`)
       const event = await eventRes.json()
 

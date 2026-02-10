@@ -111,27 +111,27 @@ export default function EventScanPage() {
 
       {/* SUCCESS */}
       {result.status === 'success' && (
-        <div className="mt-5 rounded border border-green-300 bg-green-50 p-3 text-sm">
-          <p className="mb-2 font-semibold text-green-800">
-            ✅ Check-in successful
+        <div className="mt-5 rounded bg-black p-4 text-sm text-green">
+          <p className="mb-2 font-semibold">
+            ✓ Check-in successful
           </p>
 
           <p>
-            <span className="font-medium">Event:</span>{' '}
+            <span className="font-medium text-gray-300">Event:</span>{' '}
             {result.data.eventTitle}
           </p>
 
           <p>
-            <span className="font-medium">Attendee:</span>{' '}
+            <span className="font-medium text-gray-300">Attendee:</span>{' '}
             {result.data.attendeeId}
           </p>
 
           <p>
-            <span className="font-medium">Tickets:</span>{' '}
+            <span className="font-medium text-gray-300">Tickets:</span>{' '}
             {result.data.quantity}
           </p>
 
-          <p className="mt-1 text-xs text-gray-600">
+          <p className="mt-1 text-xs text-gray-400">
             Ticket ID: {result.data.ticketId}
           </p>
         </div>

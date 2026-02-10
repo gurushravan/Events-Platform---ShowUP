@@ -87,14 +87,16 @@ export default function BookEventPage({
       })
     })
 
+    const data = await res.json()
+
     if (!res.ok) {
-      const data = await res.json()
       alert(data.error || 'Booking failed')
       setSubmitting(false)
       return
     }
 
-    router.push('/bookings/success')
+    // ✅ CRITICAL FIX: redirect WITH bookingId
+    router.push(`/bookings/success?bookingId=${data.bookingId}`)
   }
 
   if (loading) {
@@ -134,7 +136,7 @@ export default function BookEventPage({
       <select
         value={quantity}
         onChange={e => setQuantity(Number(e.target.value))}
-        className="mb-4 w-full rounded border px-3 py-2"
+        className="mb-4 w-full rounded border bg-black px-3 py-2 text-white"
         disabled={submitting}
       >
         {[1, 2, 3, 4, 5].map(n => (

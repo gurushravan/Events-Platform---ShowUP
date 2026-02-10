@@ -33,7 +33,6 @@ export default function EventCard({
   isNew,
   isSaved = false
 }: EventCardProps) {
-  // Date logic
   const eventDate = new Date(date)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -63,9 +62,7 @@ export default function EventCard({
         </div>
       )}
 
-      {/* CLICKABLE CONTENT */}
       <Link href={`/events/${id}`} className="block">
-        {/* Top row */}
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
@@ -92,22 +89,18 @@ export default function EventCard({
           )}
         </div>
 
-        {/* Title */}
         <h3 className="mb-1 line-clamp-2 text-sm font-semibold text-white">
           {title}
         </h3>
 
-        {/* Date & Time */}
         <p className="mb-2 text-xs text-white/70">
           {date} · {time}
         </p>
 
-        {/* Venue */}
         <p className="mb-3 text-xs text-white/60">
           {venue}
         </p>
 
-        {/* Bottom row */}
         <div className="flex items-center justify-between text-xs text-white/70">
           <div className="flex items-center gap-1">
             <MapPin size={12} />

@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function main() {
-  // Clean existing data
   await prisma.event.deleteMany()
   await prisma.organizer.deleteMany()
 
@@ -29,7 +28,6 @@ async function main() {
     }
   })
 
-  // Events
   await prisma.event.createMany({
     data: [
       {
